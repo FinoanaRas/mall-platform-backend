@@ -15,7 +15,11 @@ const OfferSchema = new mongoose.Schema({
     idEvent: { type: mongoose.Schema.Types.ObjectId, ref: 'Event', required: false },
     startDate: { type: Date },
     endDate: { type: Date },
-    status: { type: String }
+    status: { 
+        type: String,
+        required: true,
+        enum: ['PENDING', 'ACCEPTED'] 
+    }
 }, { collection: "offers", timestamp: true });
 
 module.exports = mongoose.model('Offer', OfferSchema);
