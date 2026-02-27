@@ -14,4 +14,16 @@ router.put('/:id', offerController.update);
 // Supprimer un offer
 router.delete('/:id', offerController.delete);
 
+// pending offers of a shop
+router.get('/shop/pending/:id', offerController.findPendingOffers);
+router.get('/shop/pending', offerController.findPendingOffers);
+
+// active offers of a shop
+router.get('/shop/active/:id', offerController.findActiveOffers);
+router.get('/shop/active', offerController.findActiveOffers);
+
+// historique offers of a shop
+router.get('/shop/historic/:id', offerController.findHistoricOffers);
+router.get('/shop/historic', offerController.findHistoricOffers);
+
 module.exports = router;

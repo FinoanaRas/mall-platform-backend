@@ -1,5 +1,6 @@
 const Offer = require('../models/Offer');
 const TargetModelService = require('../services/targetModelService');
+const OfferService = require('../services/offerService');
 // Créer un offer
 exports.create = async (req, res) => {
     try {
@@ -18,10 +19,37 @@ exports.create = async (req, res) => {
     }
 };
 
-// Lire tous les offers
+// Obtenir tous les offers
 exports.getAll = async (req, res) => {
     try {
         const offers = await Offer.find().populate('idTarget');
+        res.json(offers);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.getAllActive = async (req, res) => {
+    try {
+        const offers = await Offer.find({ status: 'ACCEPTED', endDate : { $gte: now }}).populate('idTarget');
+        res.json(offers);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.getAllPending = async (req, res) => {
+    try {
+        const offers = await Offer.find({ status: 'PENDING', endDate : { $gte: now }}).populate('idTarget');
+        res.json(offers);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.getAllHistoric = async (req, res) => {
+    try {
+        const offers = await Offer.find({ status: 'ACCEPTED', endDate : { $lt: now }}).populate('idTarget');
         res.json(offers);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -45,5 +73,56 @@ exports.delete = async (req, res) => {
         res.json({ message: "Offer supprimé" });
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+};
+
+// Offres en attente de validation
+exports.findPendingOffers = async (req, res) => {
+    try {
+        let offers;
+        // If shop id (when admin check pending offers of a shop)
+        if(req.params.id){
+            offers = await OfferService.getOffersShop(req.params.id, 'PENDING');
+        // if user id, so inside user in req, the shop user's id
+        }else{
+            offers = await OfferService.getOffers(req.user.id, 'PENDING');
+        }
+        res.json(offers);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+// Offres actifs
+exports.findActiveOffers = async (req, res) => {
+    try {
+        let offers;
+        // If shop id (when admin/user check pending offers of a shop)
+        if(req.params.id){
+            offers = await OfferService.getOffersShop(req.params.id, 'ACCEPTED');
+        // if user id, so inside user in req, the shop user's id
+        }else{
+            offers = await OfferService.getOffers(req.user.id, 'ACCEPTED');
+        }
+        res.json(offers);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+// Offres historique
+exports.findHistoricOffers = async (req, res) => {
+    try {
+        let offers;
+        // If shop id (when admin check pending offers of a shop)
+        if(req.params.id){
+            offers = await OfferService.getHistoricOffersShop(req.params.id, 'ACCEPTED');
+        // if user id, so inside user in req, the shop user's id
+        }else{
+            offers = await OfferService.getHistoricOffers(req.user.id, 'ACCEPTED');
+        }
+        res.json(offers);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
     }
 };

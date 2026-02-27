@@ -13,8 +13,8 @@ const OfferSchema = new mongoose.Schema({
         enum: ['Shop','Product']
     },
     idEvent: { type: mongoose.Schema.Types.ObjectId, ref: 'Event', required: false },
-    startDate: { type: Date },
-    endDate: { type: Date },
+    startDate: { type: Date, required: true },
+    endDate: { type: Date, required: true },
     status: { 
         type: String,
         required: true,
