@@ -8,4 +8,4 @@ const ProductSchema = new mongoose.Schema({
     rating: { type: Number, default: 0 }
 }, { collection: "products", timestamps: true });
 
-module.exports = mongoose.model('Article', ArticleSchema);
+module.exports = mongoose.model('Product', ProductSchema);
