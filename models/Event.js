@@ -5,6 +5,7 @@ const EventSchema = new mongoose.Schema({
     description: { type: String },
     startDate: { type: Date },
     endDate: { type: Date },
+    location: { type: String },
     status: { type: String }
 }, { collection: "events", timestamps: true });
 

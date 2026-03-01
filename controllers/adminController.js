@@ -4,7 +4,73 @@ const Category = require('../models/Category');
 const Event = require('../models/Event');
 const Offer = require('../models/Offer');
 const Review = require('../models/Review');
+const Notification = require('../models/Notification');
 const bcrypt = require('bcryptjs');
+
+// --- Global Search ---
+exports.globalSearch = async (req, res) => {
+    try {
+        const { q } = req.query;
+        if (!q) return res.json([]);
+
+        const regex = new RegExp(q, 'i');
+
+        const [shops, users, events, categories] = await Promise.all([
+            Shop.find({ name: regex }).limit(5).select('name logo idCategory'),
+            User.find({ name: regex }).limit(5).select('name profile email'),
+            Event.find({ title: regex }).limit(5).select('title image'),
+            Category.find({ name: regex }).limit(5).select('name')
+        ]);
+
+        const results = [
+            ...shops.map(s => ({ id: s._id, title: s.name, type: 'Boutique', icon: 'storefront', link: `/admin/shops` })),
+            ...users.map(u => ({ id: u._id, title: u.name, type: `Utilisateur (${u.profile})`, icon: 'person', link: `/admin/users` })),
+            ...events.map(e => ({ id: e._id, title: e.title, type: 'Événement', icon: 'event', link: `/admin/events` })),
+            ...categories.map(c => ({ id: c._id, title: c.name, type: 'Catégorie', icon: 'category', link: `/admin/categories` }))
+        ];
+
+        res.json(results);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+// --- Notifications ---
+exports.getNotifications = async (req, res) => {
+    try {
+        const notifications = await Notification.find().sort({ createdAt: -1 }).limit(50);
+        res.json(notifications);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+exports.markNotificationRead = async (req, res) => {
+    try {
+        await Notification.findByIdAndUpdate(req.params.id, { read: true });
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+exports.markAllNotificationsRead = async (req, res) => {
+    try {
+        await Notification.updateMany({ read: false }, { read: true });
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+exports.deleteNotification = async (req, res) => {
+    try {
+        await Notification.findByIdAndDelete(req.params.id);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
 
 // --- User Management ---
 
@@ -133,10 +199,53 @@ exports.deleteUser = async (req, res) => {
 
 exports.getDashboardStats = async (req, res) => {
     try {
+        const { period } = req.query; // 'weekly' or 'monthly'
+        const days = period === 'monthly' ? 30 : 7;
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - days);
+
+        // Core Stats
         const totalUsers = await User.countDocuments();
         const activeStores = await Shop.countDocuments();
         const newCustomers = await User.countDocuments({ profile: 'CUSTOMER', status: 1 });
         const pendingOffers = await Offer.countDocuments({ status: { $ne: 'VALIDATED' } });
+
+        // Performance Data (Registrations per day)
+        const performance = await User.aggregate([
+            { $match: { createdAt: { $gte: startDate } } },
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { "_id": 1 } }
+        ]);
+
+        // Category Distribution
+        const categoriesDist = await Shop.aggregate([
+            {
+                $group: {
+                    _id: "$idCategory",
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $lookup: {
+                    from: "categories",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "categoryInfo"
+                }
+            },
+            { $unwind: "$categoryInfo" },
+            {
+                $project: {
+                    label: "$categoryInfo.name",
+                    value: "$count"
+                }
+            }
+        ]);
 
         res.json({
             stats: [
@@ -144,7 +253,9 @@ exports.getDashboardStats = async (req, res) => {
                 { title: 'Utilisateurs Totaux', value: totalUsers, icon: 'people' },
                 { title: 'Nouveaux Clients', value: newCustomers, icon: 'person_add' },
                 { title: 'Demandes en Attente', value: pendingOffers, icon: 'pending_actions' }
-            ]
+            ],
+            performance: performance,
+            categoriesDist: categoriesDist
         });
     } catch (err) {
         res.status(500).json({ message: err.message });

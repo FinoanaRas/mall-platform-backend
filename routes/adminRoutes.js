@@ -9,6 +9,15 @@ router.use(adminMiddleware);
 // --- Dashboard ---
 router.get('/dashboard/stats', adminController.getDashboardStats);
 
+// --- Global Search ---
+router.get('/search', adminController.globalSearch);
+
+// --- Notifications ---
+router.get('/notifications', adminController.getNotifications);
+router.put('/notifications/mark-all-read', adminController.markAllNotificationsRead);
+router.put('/notifications/:id/read', adminController.markNotificationRead);
+router.delete('/notifications/:id', adminController.deleteNotification);
+
 // --- User Management ---
 router.get('/users', adminController.getAllUsers);
 router.post('/users', adminController.createUser);
