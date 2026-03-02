@@ -20,21 +20,20 @@ exports.getAll = async (req, res) => {
     }
 };
 
-// Trouver un shop
-exports.getShop = async (req, res) => {
+exports.getOneShop = async (req, res) => {
     try {
-        const body = req.body;
-        const shop = await Shop.findById(body.id);
+        const shop = await Shop.findById(req.params.id);
         res.json(shop);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
+
 // Mettre à jour un shop
 exports.update = async (req, res) => {
     try {
-        const shop = await Shop.findByIdAndUpdate(req.params.id, req.body, {new: true});
+        const shop = await Shop.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
         res.json(shop);
     } catch (error) {
         res.status(400).json({ message: error.message });

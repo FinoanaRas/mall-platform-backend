@@ -10,6 +10,8 @@ router.post('/', authMiddleware,roleMiddleware(['ADMIN']),shopController.create)
 // Lire tous les shops (public)
 router.get('/', shopController.getAll);
 
+router.get('/:id', shopController.getOneShop);
+
 // Mettre à jour un shop
 router.put('/:id', authMiddleware, roleMiddleware(['ADMIN', 'SHOP']) ,shopController.update);
 
