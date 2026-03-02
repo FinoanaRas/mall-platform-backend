@@ -28,15 +28,6 @@ exports.getAll = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-// Obtenir tous les offers pending
-exports.getAll = async (req, res) => {
-    try {
-        const offers = await Offer.find({ status: 'PENDING' }).populate('idTarget');
-        res.json(offers);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
 
 exports.getAllActive = async (req, res) => {
     try {
