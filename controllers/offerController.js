@@ -28,10 +28,20 @@ exports.getAll = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+// Obtenir tous les offers pending
+exports.getAll = async (req, res) => {
+    try {
+        const offers = await Offer.find({ status: 'PENDING' }).populate('idTarget');
+        res.json(offers);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
 
 exports.getAllActive = async (req, res) => {
     try {
-        const offers = await Offer.find({ status: 'ACCEPTED', endDate : { $gte: now }}).populate('idTarget');
+        const now = new Date();
+        const offers = await Offer.find({ status: 'VALIDATED', endDate : { $gte: now }}).populate('idTarget');
         res.json(offers);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -40,6 +50,7 @@ exports.getAllActive = async (req, res) => {
 
 exports.getAllPending = async (req, res) => {
     try {
+        const now = new Date();
         const offers = await Offer.find({ status: 'PENDING', endDate : { $gte: now }}).populate('idTarget');
         res.json(offers);
     } catch (error) {
@@ -49,7 +60,8 @@ exports.getAllPending = async (req, res) => {
 
 exports.getAllHistoric = async (req, res) => {
     try {
-        const offers = await Offer.find({ status: 'ACCEPTED', endDate : { $lt: now }}).populate('idTarget');
+        const now = new Date();
+        const offers = await Offer.find({ status: 'VALIDATED', endDate : { $lt: now }}).populate('idTarget');
         res.json(offers);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -59,7 +71,7 @@ exports.getAllHistoric = async (req, res) => {
 // Mettre à jour un offer
 exports.update = async (req, res) => {
     try {
-        const offer = await Offer.findByIdAndUpdate(req.params.id, req.body, {new: true});
+        const offer = await Offer.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
         res.json(offer);
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -99,11 +111,20 @@ exports.findActiveOffers = async (req, res) => {
         let offers;
         // If shop id (when admin/user check pending offers of a shop)
         if(req.params.id){
-            offers = await OfferService.getOffersShop(req.params.id, 'ACCEPTED');
+            offers = await OfferService.getOffersShop(req.params.id, 'VALIDATED');
         // if user id, so inside user in req, the shop user's id
         }else{
-            offers = await OfferService.getOffers(req.user.id, 'ACCEPTED');
+            offers = await OfferService.getOffers(req.user.id, 'VALIDATED');
         }
+        res.json(offers);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+exports.findActiveAll = async (req, res) => {
+    try{
+        const offers = await Offer.find({status: 'VALIDATED'}).populate();
         res.json(offers);
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -116,10 +137,10 @@ exports.findHistoricOffers = async (req, res) => {
         let offers;
         // If shop id (when admin check pending offers of a shop)
         if(req.params.id){
-            offers = await OfferService.getHistoricOffersShop(req.params.id, 'ACCEPTED');
+            offers = await OfferService.getHistoricOffersShop(req.params.id, 'VALIDATED');
         // if user id, so inside user in req, the shop user's id
         }else{
-            offers = await OfferService.getHistoricOffers(req.user.id, 'ACCEPTED');
+            offers = await OfferService.getHistoricOffers(req.user.id, 'VALIDATED');
         }
         res.json(offers);
     } catch (error) {

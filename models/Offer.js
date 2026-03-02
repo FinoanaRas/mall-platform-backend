@@ -18,7 +18,7 @@ const OfferSchema = new mongoose.Schema({
     status: { 
         type: String,
         required: true,
-        enum: ['PENDING', 'ACCEPTED'] 
+        enum: ['PENDING', 'VALIDATED'] 
     }
 }, { collection: "offers", timestamp: true });
 

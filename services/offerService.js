@@ -8,7 +8,7 @@ const OfferService = {
         return await this.getPendingOffersShop(shop._id, status);
     },
     getOffersShop : async (idShop, status) => {
-        const products = await Product.find({ shopId: idShop }).select('_id');
+        const products = await Product.find({ idShop: idShop }).select('_id');
         const now = new Date();
         return await Offer.find({
             idTarget: { $in: [idShop, ...products] },
@@ -23,7 +23,7 @@ const OfferService = {
     },
     getHistoricOffersShop : async (idShop, status) => {
         const now = new Date();
-        const products = await Product.find({ shopId: idShop }).select('_id');
+        const products = await Product.find({ idShop: idShop }).select('_id');
         return await Offer.find({
             idTarget: { $in: [idShop, ...products] },
             status: status,

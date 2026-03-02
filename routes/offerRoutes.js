@@ -7,6 +7,7 @@ router.post('/', offerController.create);
 
 // Lire tous les offers
 router.get('/', offerController.getAll);
+router.get('/active', offerController.getAllActive);
 
 // Mettre à jour un offer
 router.put('/:id', offerController.update);
