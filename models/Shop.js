@@ -7,7 +7,8 @@ const ShopSchema = new mongoose.Schema({
     idCategory: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },
     location: { type: String },
     picture: { type: String },
-    rating: { type: Number, default: 0 } // Updated manually after new reviews
+    rating: { type: Number, default: 0 }, // Updated manually after new reviews
+    status: { type: Number, default: 1 } // 1: Open, 0: Closed
 }, { collection: "shops", timestamps: true });
 
 module.exports = mongoose.model('Shop', ShopSchema);
