@@ -5,13 +5,12 @@ const roleMiddleware = require('../middlewares/roleMiddleware');
 const authMiddleware = require('../middlewares/authMiddleware');
 
 // Créer un shop
-router.post('/', authMiddleware,roleMiddleware(['SHOP']),shopController.create);
+router.post('/', authMiddleware,roleMiddleware(['ADMIN']),shopController.create);
 
-// Lire tous les shops
+// Lire tous les shops (public)
 router.get('/', shopController.getAll);
 
-// Get a shop
-router.get('/:id', shopController.getShop);
+router.get('/:id', shopController.getOneShop);
 
 // Mettre à jour un shop
 router.put('/:id', authMiddleware, roleMiddleware(['ADMIN', 'SHOP']) ,shopController.update);

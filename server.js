@@ -21,10 +21,13 @@ app.use(authMiddleware);
 
 // Routes
 app.use('/auth', require('./routes/authRoutes'));
-app.use('/articles', require('./routes/articleRoutes'));
+app.use('/products', require('./routes/productRoutes'));
 app.use('/shops', require('./routes/shopRoutes'));
 app.use('/offers', require('./routes/offerRoutes'));
 app.use('/admin', require('./routes/adminRoutes'));
+app.use('/review', require('./routes/reviewRoutes'));
+app.use('/reduction', require('./routes/reductionRoutes'));
+app.use('/favorite', require('./routes/favoriteRoutes'));
 
 const startServer = async () => {
   if (!process.env.MONGO_URI) {
