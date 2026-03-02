@@ -6,16 +6,16 @@ const EXCLUDED_PATHS = [
 
 // Check if client has token, unless in exluded paths
 const authMiddleware = (req, res, next) => {
-    if (EXCLUDED_PATHS.includes(req.path) || req.path.startsWith("/auth")) 
+    if (req.method === 'OPTIONS' || EXCLUDED_PATHS.includes(req.path) || req.path.startsWith("/auth"))
         return next();
 
     const authHeader = req.headers['authorization'];
-    if (!authHeader){ return res.status(401).json({ message: 'No token provided' });}
+    if (!authHeader) { return res.status(401).json({ message: 'No token provided' }); }
 
     const token = authHeader.split(' ')[1];
     try {
         const user = AuthService.verifyToken(token);
-        req.user = user;                
+        req.user = user;
         next();
     } catch (err) {
         console.log("Token invalide détécté");

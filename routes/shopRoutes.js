@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const shopController = require('../controllers/shopController');
 const roleMiddleware = require('../middlewares/roleMiddleware');
-const authMiddleware = require('../middlewares/AuthMiddleware');
+const authMiddleware = require('../middlewares/authMiddleware');
 
 // Créer un shop
 router.post('/', authMiddleware,roleMiddleware(['SHOP']),shopController.create);
