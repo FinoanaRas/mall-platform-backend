@@ -8,7 +8,7 @@ router.post('/', authMiddleware, roleMiddleware(['SHOP']), productController.cre
 router.get('/all', productController.getAll);
 router.get('/:id', productController.getById);
 router.get('/', productController.getByFilter);
-router.put('/',  authMiddleware, roleMiddleware(['SHOP']), productController.update);
-router.delete('/',  authMiddleware, roleMiddleware(['SHOP']), productController.delete);
+router.put('/:id',  authMiddleware, roleMiddleware(['SHOP']), productController.update);
+router.delete('/:id',  authMiddleware, roleMiddleware(['SHOP']), productController.delete);
 
 module.exports = router;
