@@ -6,7 +6,11 @@ const Review = require('../models/Review');
 // Créer un shop
 exports.create = async (req, res) => {
     try {
-        const shop = new Shop(req.body);
+        const shopData = { ...req.body };
+        if (req.file) {
+            shopData.picture = req.file.path;
+        }
+        const shop = new Shop(shopData);
         await shop.save();
         res.status(201).json(shop);
     } catch (error) {
@@ -58,7 +62,11 @@ exports.getCategories = async (req, res) => {
 // Mettre à jour un shop
 exports.update = async (req, res) => {
     try {
-        const shop = await Shop.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const updateData = { ...req.body };
+        if (req.file) {
+            updateData.picture = req.file.path;
+        }
+        const shop = await Shop.findByIdAndUpdate(req.params.id, updateData, { new: true });
         res.json(shop);
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -167,9 +175,22 @@ exports.getStats = async (req, res) => {
 // Mettre à jour le profil de son propre shop
 exports.updateProfile = async (req, res) => {
     try {
+        const updateData = { ...req.body };
+        if (req.file) {
+            updateData.picture = req.file.path;
+        }
+
+        // Handle nested forms passed via FormData:
+        if (updateData.contactInfo && typeof updateData.contactInfo === 'string') {
+            try { updateData.contactInfo = JSON.parse(updateData.contactInfo); } catch (e) { }
+        }
+        if (updateData.openingHours && typeof updateData.openingHours === 'string') {
+            try { updateData.openingHours = JSON.parse(updateData.openingHours); } catch (e) { }
+        }
+
         const shop = await Shop.findOneAndUpdate(
             { idOwner: req.user.id },
-            req.body,
+            updateData,
             { new: true }
         );
         if (!shop) return res.status(404).json({ message: "Boutique non trouvée." });

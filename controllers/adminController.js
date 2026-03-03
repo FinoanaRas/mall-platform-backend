@@ -307,7 +307,11 @@ exports.getAllShops = async (req, res) => {
 
 exports.createShop = async (req, res) => {
     try {
-        const shop = new Shop(req.body);
+        const shopData = { ...req.body };
+        if (req.file) {
+            shopData.picture = req.file.path;
+        }
+        const shop = new Shop(shopData);
         await shop.save();
         res.status(201).json(shop);
     } catch (err) {
@@ -317,7 +321,11 @@ exports.createShop = async (req, res) => {
 
 exports.updateShop = async (req, res) => {
     try {
-        const shop = await Shop.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const updateData = { ...req.body };
+        if (req.file) {
+            updateData.picture = req.file.path;
+        }
+        const shop = await Shop.findByIdAndUpdate(req.params.id, updateData, { new: true });
         res.json(shop);
     } catch (err) {
         res.status(400).json({ message: err.message });

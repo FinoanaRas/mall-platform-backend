@@ -33,6 +33,7 @@ app.use('/auth', require('./routes/authRoutes'));
 app.use('/articles', require('./routes/articleRoutes'));
 app.use('/shops', require('./routes/shopRoutes'));
 app.use('/offers', require('./routes/offerRoutes'));
+app.use('/products', require('./routes/productRoutes'));
 
 // Routes - Protected
 app.use('/admin', authMiddleware, require('./routes/adminRoutes'));
@@ -49,7 +50,7 @@ io.on('connection', (socket) => {
 
 // Watch MongoDB Collections
 const watchCollections = () => {
-  const collections = ['shops', 'events', 'users', 'categories', 'offers', 'reviews'];
+  const collections = ['shops', 'events', 'users', 'categories', 'offers', 'reviews', 'products'];
 
   collections.forEach(colName => {
     try {

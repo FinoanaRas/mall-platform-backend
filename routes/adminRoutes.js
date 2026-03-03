@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
 const adminMiddleware = require('../middlewares/adminMiddleware');
+const { upload } = require('../config/cloudinary');
 
 // Apply admin middleware to all routes in this file
 router.use(adminMiddleware);
@@ -33,8 +34,8 @@ router.delete('/categories/:id', adminController.deleteCategory);
 
 // --- Shop Management ---
 router.get('/shops', adminController.getAllShops);
-router.post('/shops', adminController.createShop);
-router.put('/shops/:id', adminController.updateShop);
+router.post('/shops', upload.single('picture'), adminController.createShop);
+router.put('/shops/:id', upload.single('picture'), adminController.updateShop);
 router.delete('/shops/:id', adminController.deleteShop);
 
 // --- Event Management ---
