@@ -1,12 +1,8 @@
 const AuthService = require('../services/authService');
 
-const EXCLUDED_PATHS = [
-    '/shops',
-];
-
-// Check if client has token, unless in exluded paths
+// Authenticate request token
 const authMiddleware = (req, res, next) => {
-    if (req.method === 'OPTIONS' || EXCLUDED_PATHS.includes(req.path) || req.path.startsWith("/auth"))
+    if (req.method === 'OPTIONS')
         return next();
 
     const authHeader = req.headers['authorization'];

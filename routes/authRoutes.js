@@ -14,6 +14,26 @@ router.post('/login', async (req, res) => {
     }
 });
 
+router.post('/forgot-password', async (req, res) => {
+    try {
+        const { email } = req.body;
+        await authService.requestPasswordReset(email);
+        res.json({ message: "Si l'adresse email existe, un lien de réinitialisation a été envoyé." });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+router.post('/reset-password', async (req, res) => {
+    try {
+        const { token, newPassword } = req.body;
+        await authService.resetPassword(token, newPassword);
+        res.json({ message: "Votre mot de passe a été réinitialisé avec succès." });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 router.post('/customer/sign-up', async (req, res) => {
     try {
         const { name, email, password } = req.body;

@@ -10,12 +10,12 @@ const OfferSchema = new mongoose.Schema({
     targetType: {
         type: String,
         required: true,
-        enum: ['Shop','Product']
+        enum: ['Shop', 'Product']
     },
     idEvent: { type: mongoose.Schema.Types.ObjectId, ref: 'Event', required: false },
     startDate: { type: Date },
     endDate: { type: Date },
     status: { type: String }
-}, { collection: "offers", timestamp: true });
+}, { collection: "offers", timestamps: true });
 
 module.exports = mongoose.model('Offer', OfferSchema);

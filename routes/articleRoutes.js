@@ -14,9 +14,15 @@ router.post('/', async (req, res) => {
 });
 
 // Lire tous les articles
-router.get('/', async (_req, res) => {
+router.get('/', async (req, res) => {
     try {
-        const articles = await Product.find();
+        const { category, search, q } = req.query;
+        let query = {};
+        if (category) query.idCategory = category;
+        const searchTerm = q || search;
+        if (searchTerm) query.name = { $regex: searchTerm, $options: 'i' };
+
+        const articles = await Product.find(query).populate('idCategory').populate('idShop');
         res.json(articles);
     } catch (error) {
         res.status(500).json({ message: error.message });
